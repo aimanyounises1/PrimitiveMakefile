@@ -15,14 +15,15 @@ public class Makefile {
 		headers = new LinkedList<String>();
 		for (int i = 0; i < Make.length; i++) {
 			String s = Make[i];
-			boolean Cfile = s.charAt(s.length()-1) == 'h' ;
+			int len = s.length();
+			boolean Cfile = s.charAt(s.length()-1) == 'h'||s.substring(len -4, len).equals(".hpp") ;
 			if(!Cfile) {
 			 names.add(Make[i]);
 			}
 		}
 		for (int i = 0; i < Make.length; i++) {
 			String s = Make[i];
-			if(s.contains(".h"))
+			if(s.contains(".h")||s.contains(".hpp"))
 			headers.add(Make[i]);
 		}
 		
@@ -41,7 +42,6 @@ public class Makefile {
 			bw.write(string.substring(0, string.length() -2)+ " ");
 		}
 		for (int i = 0; i < names.size(); i++) {
-			String s = names.get(i);
 			bw.newLine();
 			bw.append(names.get(i).substring(0, names.get(i).length() -2)+":");
 			bw.newLine();
@@ -87,7 +87,18 @@ public class Makefile {
 			bw.append(names.get(i).substring(0, names.get(i).length() -4)+":");
 			bw.newLine();
 			bw.append("\t");
-			bw.append("$(CC) $(CXXFLAGS) -o " + names.get(i).substring(0, names.get(i).length() -4) +" "+names.get(i));
+			String ss ="";
+			for (int j = 0; j < names.size(); j++) {
+				String s1 = names.get(i).substring(0, names.get(i).length()-4);
+				s1 = s1 + ".hpp";
+				ss = headers.contains(s1) != false ?  s1 : "";
+			//	System.out.println(ss);
+				if(ss.length() > 0) break;
+			}
+			bw.append("$(CC) $(CXXFLAGS) -o " +
+					names.get(i).substring(0, names.get(i).length() -4)
+					+" "+names.get(i)+ " "
+					+ ss);
 		}
 		bw.newLine();
 		bw.append("clean");
@@ -104,9 +115,9 @@ public class Makefile {
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		String [] prog = {"filter.c","main.c", "filter.h"};
+		String [] prog = {"filter.cpp","main.cpp", "filter.hpp"};
 		Makefile a = new Makefile(prog);
-		a.buildCMakeFile();
+		a.buildClang9Makefile();
 		
 		
 	}
